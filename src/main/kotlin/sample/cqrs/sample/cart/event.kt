@@ -1,4 +1,4 @@
-package sample.cqrs.foodcart.core
+package sample.cqrs.sample.cart
 
 sealed class CartEvent(open val cartId: CartId)
 

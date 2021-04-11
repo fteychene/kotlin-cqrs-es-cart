@@ -1,6 +1,6 @@
-package sample.cqrs.foodcart.query
+package sample.cqrs.sample.cart.read
 
-import sample.cqrs.foodcart.core.*
+import sample.cqrs.sample.cart.*
 
 data class FullCart(
     val id: CartId = "",
@@ -9,16 +9,16 @@ data class FullCart(
     val confirmed: Boolean = false
 )
 
-class FullCartProjection(
+class FullCartReadModel(
     private val prices: Map<ProductId, Double>
-): Projection<CartEvent> {
+) {
 
     val datas: MutableMap<CartId, FullCart> = mutableMapOf()
 
     fun computePrice(cart: FullCart): FullCart =
         cart.copy(price = cart.products.map { (key, value) -> prices[key]!!*value }.sum())
 
-    override fun handleEvent(event: CartEvent) {
+    fun handleEvent(event: CartEvent) {
         val t = datas.getOrDefault(event.cartId, FullCart())
         val latest = when(event) {
             is CartCreatedEvent -> t.copy(id = event.cartId)
@@ -31,16 +31,4 @@ class FullCartProjection(
 
     fun getProjection(id: CartId): FullCart? = datas[id]
 
-}
-
-class OrderConfirmedProjection: Projection<CartEvent> {
-    private var counter = 0
-
-    override fun handleEvent(event: CartEvent) {
-        if (event is OrderConfirmedEvent) {
-            counter += 1
-        }
-    }
-
-    fun getProjection(): Int = counter
 }
